@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "journalist_run",
+      "agentId": "Journalist2026_1",
+      "name": "Journalist Run",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "0 */4 * * *" },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "最新ニュースを1件調べて shared/news_feed.md に投稿してください"
+      },
+      "delivery": { "mode": "none" }
+    },
+    {
+      "id": "spreader_run",
+      "agentId": "Spreader2026_1",
+      "name": "Spreader Run",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "10 */4 * * *" },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "shared/news_feed.md を read ツールで読み、最新の #事実 タグの記事をタブロイド紙風に大げさに書き直して write ツールで同ファイルに追記してください"
+      },
+      "delivery": { "mode": "none" }
+    },
+    {
+      "id": "citizen1_run",
+      "agentId": "Citizen2026_1",
+      "name": "Citizen1 Run",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "20 */4 * * *" },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "shared/news_feed.md を read ツールで読み、気になった記事を選んで、判断結果を shared/trust_scores.md に write ツールで追記してください"
+      },
+      "delivery": { "mode": "none" }
+    },
+    {
+      "id": "citizen2_run",
+      "agentId": "Citizen2026_2",
+      "name": "Citizen2 Run",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "25 */4 * * *" },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "shared/news_feed.md を read ツールで読み、気になった記事を選んで、判断結果を shared/trust_scores.md に write ツールで追記してください"
+      },
+      "delivery": { "mode": "none" }
+    },
+    {
+      "id": "factchecker_run",
+      "agentId": "Factchecker2026_1",
+      "name": "Factchecker Run",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "40 */4 * * *" },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "shared/news_feed.md の #要検証 記事を検証してください"
+      },
+      "delivery": { "mode": "none" }
+    },
+    {
+      "id": "observer_run",
+      "agentId": "Observer2026_1",
+      "name": "Observer Run",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "50 */4 * * *" },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "shared/news_feed.md と shared/trust_scores.md を read ツールで読み、この4時間のシミュレーション結果をレポートとしてまとめ、shared/reports/ に report_{YYYY-MM-DD_HH}.md として write ツールで保存してください"
+      },
+      "delivery": {
+        "mode": "announce",
+        "account": "observer",
+        "to": "YOUR_TELEGRAM_CHAT_ID"
+      }
+    }
+  ]
+}

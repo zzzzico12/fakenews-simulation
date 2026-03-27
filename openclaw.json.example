@@ -1,0 +1,91 @@
+{
+  "agents": {
+    "defaults": {
+      "model": { "primary": "anthropic/claude-sonnet-4-6" },
+      "workspace": "/path/to/.openclaw/workspace/fakenews",
+      "sandbox": {
+        "mode": "all",
+        "workspaceAccess": "rw",
+        "scope": "agent",
+        "workspaceRoot": "/path/to/.openclaw/sandboxes"
+      }
+    },
+    "list": [
+      {
+        "id": "Journalist2026_1",
+        "agentDir": "/path/to/.openclaw/workspace/fakenews/agents/Journalist2026_1_bot",
+        "tools": { "allow": ["web_search", "read", "write", "memory_search"] }
+      },
+      {
+        "id": "Spreader2026_1",
+        "agentDir": "/path/to/.openclaw/workspace/fakenews/agents/Spreader2026_1_bot",
+        "tools": {
+          "allow": ["read", "write", "memory_search"],
+          "deny": ["web_search", "cron", "gateway"]
+        }
+      },
+      {
+        "id": "Citizen2026_1",
+        "agentDir": "/path/to/.openclaw/workspace/fakenews/agents/Citizen2026_1_bot",
+        "tools": {
+          "allow": ["read", "write", "memory_search"],
+          "deny": ["web_search", "cron", "gateway"]
+        }
+      },
+      {
+        "id": "Citizen2026_2",
+        "agentDir": "/path/to/.openclaw/workspace/fakenews/agents/Citizen2026_2_bot",
+        "tools": {
+          "allow": ["read", "write", "memory_search"],
+          "deny": ["web_search", "cron", "gateway"]
+        }
+      },
+      {
+        "id": "Factchecker2026_1",
+        "agentDir": "/path/to/.openclaw/workspace/fakenews/agents/Factchecker2026_1_bot",
+        "tools": { "allow": ["web_search", "read", "write", "memory_search"] }
+      },
+      {
+        "id": "Observer2026_1",
+        "agentDir": "/path/to/.openclaw/workspace/fakenews/agents/Observer2026_1_bot",
+        "sandbox": { "mode": "all", "workspaceAccess": "rw", "scope": "agent" },
+        "tools": {
+          "allow": ["read", "write", "memory_search"],
+          "deny": ["web_search", "edit", "apply_patch", "cron", "gateway"]
+        }
+      }
+    ]
+  },
+  "tools": {
+    "profile": "coding",
+    "web": { "search": { "enabled": true, "provider": "tavily" } },
+    "sandbox": {
+      "tools": { "allow": ["read", "write", "web_search", "memory_search"] }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groups": { "*": { "requireMention": true } },
+      "groupPolicy": "allowlist",
+      "streaming": "partial",
+      "accounts": {
+        "journalist":   { "botToken": "YOUR_JOURNALIST_BOT_TOKEN" },
+        "spreader":     { "botToken": "YOUR_SPREADER_BOT_TOKEN" },
+        "citizen1":     { "botToken": "YOUR_CITIZEN1_BOT_TOKEN" },
+        "citizen2":     { "botToken": "YOUR_CITIZEN2_BOT_TOKEN" },
+        "factchecker":  { "botToken": "YOUR_FACTCHECKER_BOT_TOKEN" },
+        "observer":     { "botToken": "YOUR_OBSERVER_BOT_TOKEN" }
+      }
+    }
+  },
+  "bindings": [
+    { "agentId": "Journalist2026_1",  "match": { "channel": "telegram", "accountId": "journalist" } },
+    { "agentId": "Spreader2026_1",    "match": { "channel": "telegram", "accountId": "spreader" } },
+    { "agentId": "Citizen2026_1",     "match": { "channel": "telegram", "accountId": "citizen1" } },
+    { "agentId": "Citizen2026_2",     "match": { "channel": "telegram", "accountId": "citizen2" } },
+    { "agentId": "Factchecker2026_1", "match": { "channel": "telegram", "accountId": "factchecker" } },
+    { "agentId": "Observer2026_1",    "match": { "channel": "telegram", "accountId": "observer" } }
+  ]
+}

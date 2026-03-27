@@ -1,0 +1,25 @@
+# APIキー・認証情報
+.env
+openclaw.json
+
+# 実行時データ
+shared/news_feed.md
+shared/trust_scores.md
+shared/factcheck_*.md
+shared/reports/*.md
+
+# cronの実行状態（チャットIDなどが含まれる）
+cron/jobs.json
+cron/jobs.json.bak
+cron/runs/
+
+# openclaw 内部状態
+.openclaw/
+agents/*/auth-profiles.json
+agents/*/.openclaw/
+
+# 空ディレクトリのプレースホルダーは残す
+!shared/.gitkeep
+# shared/reports/ 配下は全除外だが .gitkeep だけ残す
+shared/reports/*
+!shared/reports/.gitkeep
