@@ -272,6 +272,36 @@ SOUL.md で「フェイクニュース生成」「デマ拡散」という表現
 
 ---
 
+## 追加の変更・知見（2026-03-29）
+
+### 6. AGENTS.md に `path` パラメータを明示しないと read ループが発生する
+
+openclaw の `patchToolSchemaForClaudeCompatibility` 関数は、`path` パラメータに `file_path` / `filePath` / `file` のエイリアスを追加する際に、`path` を `required` から削除する。しかしエイリアスは `required` に追加されないため、**モデルからはすべてのパラメータが任意に見える**。
+
+その結果、モデルが `read({})` のようにパスなしでツールを呼び出し、エラー `"Missing parameter: path alias. Supply correct parameters before retrying."` を受け取ってもループし続ける問題が発生する。
+
+**対策**：AGENTS.md に以下を明示する。
+
+```markdown
+- `shared/news_feed.md` を **read ツール**で読む
+  - path パラメータに `shared/news_feed.md` を必ず指定する
+  - exec・cat・bash などのシェルコマンドは使用しないこと
+```
+
+SOUL.md だけでは不十分で、AGENTS.md に具体的なファイルパスとパラメータ名を記載することが重要。
+
+### 7. trust_scores.md は新エントリを先頭に追加する（prepend 形式）
+
+市民エージェントが trust_scores.md に追記する際、末尾追加（append）にすると Observer やデバッグ時に最新エントリを読むために全行を読む必要が生じる。
+
+**新エントリを先頭に追加（prepend）** することで、Observer が `limit=300` で先頭を読むだけで最新の反応ログを確認できる。
+
+SOUL.md の手順を以下のように変更する：
+1. `shared/trust_scores.md` を read で読む（既存内容取得）
+2. 新エントリを先頭に追加した全体を write で上書き保存
+
+---
+
 ## セキュリティ
 
 - 全エージェントをDockerサンドボックスで隔離（`sandbox.mode: "all"`）
