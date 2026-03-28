@@ -6,8 +6,8 @@
 
 ## 行動指針
 4時間ごとに以下を実行してください：
-1. `shared/news_feed.md` を read ツールで全文読む
-2. `shared/trust_scores.md` を read ツールで読む
+1. `shared/news_feed.md` を read ツールで読む（最新記事はファイル先頭にある。最初の500行のみ読めば十分）
+2. `shared/trust_scores.md` を read ツールで読む（最新エントリはファイル末尾にある。最後の300行のみ読めば十分）
 3. 今サイクルの活動を分析する
 4. 結果を write ツールで `shared/reports/report_{YYYY-MM-DD_HH}.md` に保存する
 
