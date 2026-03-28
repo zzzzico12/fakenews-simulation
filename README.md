@@ -126,12 +126,20 @@ openclaw pairing approve telegram {CODE}
 ```
 fakenews/
 ├── agents/
-│   ├── Journalist2026_1_bot/SOUL.md   # 記者の人格定義
-│   ├── Spreader2026_1_bot/SOUL.md     # タブロイド記者の人格定義
-│   ├── Citizen2026_1_bot/SOUL.md      # 市民1の人格定義
-│   ├── Citizen2026_2_bot/SOUL.md      # 市民2の人格定義
-│   ├── Factchecker2026_1_bot/SOUL.md  # ファクトチェッカーの人格定義
-│   └── Observer2026_1_bot/SOUL.md     # 観察者の人格定義
+│   ├── Journalist2026_1_bot/
+│   │   └── SOUL.md                    # 記者の人格定義・行動指針
+│   ├── Spreader2026_1_bot/
+│   │   ├── SOUL.md                    # タブロイド記者の人格定義・行動指針
+│   │   └── AGENTS.md                  # ツール使用方針（read/write限定）
+│   ├── Citizen2026_1_bot/
+│   │   └── SOUL.md                    # 市民1の人格定義（会社員）
+│   ├── Citizen2026_2_bot/
+│   │   └── SOUL.md                    # 市民2の人格定義（高齢者）
+│   ├── Factchecker2026_1_bot/
+│   │   ├── SOUL.md                    # ファクトチェッカーの人格定義・検証フォーマット
+│   │   └── AGENTS.md                  # ツール使用方針（read/write/web_search）
+│   └── Observer2026_1_bot/
+│       └── SOUL.md                    # 観察者の人格定義・レポートフォーマット
 ├── shared/                            # エージェント間の共有データ（gitignore）
 │   ├── news_feed.md                   # 記事が蓄積されるメインファイル
 │   ├── trust_scores.md                # 市民の信頼判断ログ
@@ -214,6 +222,19 @@ Observerの`SOUL.md`に分析項目を追加することで、レポートをリ
 ```
 
 エージェントの性格・行動指針・出力フォーマットをすべてMarkdownで記述できる。
+
+## AGENTS.md とは
+
+ツール使用方針を補足するファイル。SOUL.md はシステムプロンプトとして読み込まれるが、AGENTS.md はエージェントが参照する追加指示ファイルとして機能する。
+
+openclawの isolated cron 実行では、エージェントは Docker サンドボックス内で起動し、`shared/` ディレクトリへのアクセスに gateway の **read/write ツール**を使う必要がある（sandbox 内の exec/cat は機能しない）。AGENTS.md でこの使い分けを明示することで、エージェントが正しいツールを選択できるよう補助している。
+
+```markdown
+## ツール使用方針
+1. `shared/news_feed.md` を **read ツール**で読む（exec や cat は使わないこと）
+2. `#事実` タグの最新記事を探す
+3. タブロイド風に書き直した記事を **write ツール**で `shared/news_feed.md` に追記する
+```
 
 ---
 
