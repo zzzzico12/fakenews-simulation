@@ -35,6 +35,14 @@ OPENCLAW_CONFIG_DIR=/Users/yourname/.openclaw
 OPENCLAW_WORKSPACE_DIR=/Users/yourname/.openclaw/workspace
 ANTHROPIC_API_KEY=sk-ant-...
 TAVILY_API_KEY=tvly-...
+
+# Telegram Bot Tokens（BotFather で取得）
+TELEGRAM_BOT_TOKEN_JOURNALIST=
+TELEGRAM_BOT_TOKEN_SPREADER=
+TELEGRAM_BOT_TOKEN_CITIZEN1=
+TELEGRAM_BOT_TOKEN_CITIZEN2=
+TELEGRAM_BOT_TOKEN_FACTCHECKER=
+TELEGRAM_BOT_TOKEN_OBSERVER=
 ```
 
 ### 4. Gateway の起動
@@ -176,7 +184,7 @@ touch ~/.openclaw/workspace/fakenews/shared/trust_scores.md
 ## 行動指針
 1. `shared/news_feed.md` を read ツールで読む
 2. `#事実` タグの最新記事を選ぶ
-3. タブロイド紙風に書き直したバージョンを write ツールで `shared/news_feed.md` に追記する
+3. タブロイド紙風に書き直したバージョンを**先頭に追加**した全体を write ツールで `shared/news_feed.md` に上書き保存する（既存内容は消さずに、新記事を先頭に置く）
 
 ## 書き直しルール
 - 数字は大げさに強調する（例: 400億ドル → 「史上最大級の賭け」）
@@ -335,38 +343,36 @@ touch ~/.openclaw/workspace/fakenews/shared/trust_scores.md
 ただ観察・記録・分析するだけです。
 
 ## 行動指針
-4時間ごとに以下を実行してください：
-1. `shared/news_feed.md` を read ツールで読む（最新記事はファイル先頭にある。最初の500行のみ読めば十分）
-2. `shared/trust_scores.md` を read ツールで読む（最新エントリはファイル末尾にある。最後の300行のみ読めば十分）
-3. 今サイクルの活動を分析する
-4. 結果を write ツールで `shared/reports/report_{YYYY-MM-DD_HH}.md` に保存する
+毎日以下を実行してください：
+1. `shared/trust_scores.md` を read ツールで読む（最新エントリはファイル先頭にある。最初の300行のみ読めば十分）
+2. 今サイクルの活動を分析する
+3. 結果を write ツールで `shared/reports/report_{YYYY-MM-DD_HH}.md` に保存する
 
-## 分析項目
-- `#事実` タグの記事数
-- `#要検証` タグの記事数（タブロイド版）
-- `#検証済み` タグの記事数
-- 市民の信頼判断ログ（trust_scores.md の内容）
-- ファクトチェック結果の概要
-- 特筆すべき出来事や傾向
+**news_feed.md は読まなくてよい。**
+
+## 分析の焦点
+trust_scores.md のみを分析対象とし、以下を読み解く：
+- Citizen1（会社員）が信じた数・疑った数
+- Citizen2（高齢者）が信じた数・疑った数
+- 2人の傾向の違い（どちらがより信じやすいか）
+
+ニュースの内容・記事タイトル・news_feed.md の内容は一切書かないこと。
 
 ## レポートフォーマット（write ツールで shared/reports/report_{YYYY-MM-DD_HH}.md に保存）
 ---
-# シミュレーション時間レポート
-## 期間：{期間}
+# 市民反応分析レポート
+## 日付：{日付}
 
-## 1. ニュースフィード活動
-{このサイクルに投稿された記事・検証結果の概要}
+## 1. Citizen1（会社員）
+- 信じた：{N}件 / 疑った：{N}件
+- 傾向：{一言}
 
-## 2. 市民反応ログ活動
-{trust_scores.md に記録された市民の信頼判断の概要}
+## 2. Citizen2（高齢者）
+- 信じた：{N}件 / 疑った：{N}件
+- 傾向：{一言}
 
-## 3. この時間帯の全体評価
-### エージェント稼働サマリー
-| エージェント | 活動内容 | 投稿数 |
-|---|---|---|
-
-## 4. シミュレーション設計上の特筆事項
-{観察された興味深い傾向・パターン・エージェント間の相互作用}
+## 3. 比較・総評
+{2人の違いと観察された傾向を2〜3文で}
 
 ---
 *レポート作成：observer2026_1 / {日時}*
@@ -397,6 +403,12 @@ TAVILY_API_KEY=tvly-...
 ```yaml
 ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
 TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+TELEGRAM_BOT_TOKEN_JOURNALIST: ${TELEGRAM_BOT_TOKEN_JOURNALIST:-}
+TELEGRAM_BOT_TOKEN_SPREADER: ${TELEGRAM_BOT_TOKEN_SPREADER:-}
+TELEGRAM_BOT_TOKEN_CITIZEN1: ${TELEGRAM_BOT_TOKEN_CITIZEN1:-}
+TELEGRAM_BOT_TOKEN_CITIZEN2: ${TELEGRAM_BOT_TOKEN_CITIZEN2:-}
+TELEGRAM_BOT_TOKEN_FACTCHECKER: ${TELEGRAM_BOT_TOKEN_FACTCHECKER:-}
+TELEGRAM_BOT_TOKEN_OBSERVER: ${TELEGRAM_BOT_TOKEN_OBSERVER:-}
 ```
 
 ---
@@ -494,12 +506,12 @@ docker ps -a | grep openclaw-sandbox | awk '{print $1}' | xargs docker rm -f
       "groupPolicy": "allowlist",
       "streaming": "partial",
       "accounts": {
-        "journalist":   { "botToken": "JOURNALIST_BOT_TOKEN" },
-        "spreader":     { "botToken": "SPREADER_BOT_TOKEN" },
-        "citizen1":     { "botToken": "CITIZEN1_BOT_TOKEN" },
-        "citizen2":     { "botToken": "CITIZEN2_BOT_TOKEN" },
-        "factchecker":  { "botToken": "FACTCHECKER_BOT_TOKEN" },
-        "observer":     { "botToken": "OBSERVER_BOT_TOKEN" }
+        "journalist":   { "botToken": "${TELEGRAM_BOT_TOKEN_JOURNALIST}" },
+        "spreader":     { "botToken": "${TELEGRAM_BOT_TOKEN_SPREADER}" },
+        "citizen1":     { "botToken": "${TELEGRAM_BOT_TOKEN_CITIZEN1}" },
+        "citizen2":     { "botToken": "${TELEGRAM_BOT_TOKEN_CITIZEN2}" },
+        "factchecker":  { "botToken": "${TELEGRAM_BOT_TOKEN_FACTCHECKER}" },
+        "observer":     { "botToken": "${TELEGRAM_BOT_TOKEN_OBSERVER}" }
       }
     }
   },
@@ -530,18 +542,19 @@ docker compose up -d
 
 ## ステップ9: Cron ジョブの設定
 
-以下のコマンドを順番に実行（4時間ごと、情報フローに沿った時刻順）:
+以下のコマンドを順番に実行（毎日 JST 7時台、情報フローに沿った時刻順）:
 
 ```bash
-openclaw cron add --id journalist_run  --agent Journalist2026_1  --cron "0 */4 * * *"  --session isolated --message "最新ニュースを1件調べて shared/news_feed.md に投稿してください"
-openclaw cron add --id spreader_run    --agent Spreader2026_1    --cron "10 */4 * * *" --session isolated --message "shared/news_feed.md を read ツールで読み、最新の #事実 タグの記事をタブロイド紙風に大げさに書き直して write ツールで同ファイルに追記してください"
-openclaw cron add --id citizen1_run    --agent Citizen2026_1     --cron "20 */4 * * *" --session isolated --message "shared/news_feed.md を read ツールで読み、気になった記事を選んで、判断結果を shared/trust_scores.md に write ツールで追記してください"
-openclaw cron add --id citizen2_run    --agent Citizen2026_2     --cron "25 */4 * * *" --session isolated --message "shared/news_feed.md を read ツールで読み、気になった記事を選んで、判断結果を shared/trust_scores.md に write ツールで追記してください"
-openclaw cron add --id factchecker_run --agent Factchecker2026_1 --cron "40 */4 * * *" --session isolated --message "shared/news_feed.md の #要検証 記事を検証してください"
-openclaw cron add --id observer_run    --agent Observer2026_1    --cron "50 */4 * * *" --session isolated --announce --account observer --to {YOUR_TELEGRAM_CHAT_ID} --message "shared/news_feed.md と shared/trust_scores.md を read ツールで読み、この4時間のシミュレーション結果をレポートとしてまとめ、shared/reports/ に report_{YYYY-MM-DD_HH}.md として write ツールで保存してください"
+openclaw cron add --id journalist_run  --agent Journalist2026_1  --cron "0 22 * * *"  --session isolated --message "最新ニュースを1件調べて shared/news_feed.md の先頭に追加してください。記事の末尾には必ず「タグ: #事実」を付けてください。"
+openclaw cron add --id spreader_run    --agent Spreader2026_1    --cron "10 22 * * *" --session isolated --message "shared/news_feed.md を read ツールで読み、最新の #事実 タグの記事をタブロイド紙風に大げさに書き直して末尾に「タグ: #要検証」を付け、新記事を先頭に追加した全体を write ツールで shared/news_feed.md に上書き保存してください"
+openclaw cron add --id citizen1_run    --agent Citizen2026_1     --cron "20 22 * * *" --session isolated --message "shared/news_feed.md を read ツールで読み、気になった記事を選んで、shared/trust_scores.md を read ツールで読み、新エントリを先頭に追加した全体を write ツールで上書き保存してください"
+openclaw cron add --id citizen2_run    --agent Citizen2026_2     --cron "25 22 * * *" --session isolated --message "shared/news_feed.md を read ツールで読み、気になった記事を選んで、shared/trust_scores.md を read ツールで読み、新エントリを先頭に追加した全体を write ツールで上書き保存してください"
+openclaw cron add --id factchecker_run --agent Factchecker2026_1 --cron "40 22 * * *" --session isolated --enabled false --message "shared/news_feed.md の #要検証 記事を検証してください"
+openclaw cron add --id observer_run    --agent Observer2026_1    --cron "50 22 * * *" --session isolated --announce --account observer --to {YOUR_TELEGRAM_CHAT_ID} --message "shared/trust_scores.md を read ツールで読み、この1日のシミュレーション結果をレポートとしてまとめ、shared/reports/ に report_{YYYY-MM-DD_HH}.md として write ツールで保存してください"
 ```
 
 > `{YOUR_TELEGRAM_CHAT_ID}` は次のステップで確認できる数値ID（例: `7924681156`）
+> スケジュールは UTC 22:xx = JST 7:xx。Factchecker はデフォルト無効（`--enabled false`）。
 
 ---
 
